@@ -7,6 +7,7 @@
 #include <linux/in.h>
 #include <linux/tcp.h>
 */
+
 SEC("classifier")
 
 int patch_server_port(struct __sk_buff *skb) {
@@ -40,8 +41,8 @@ int patch_server_port(struct __sk_buff *skb) {
 	__u16 src_port = load_half(skb, tcphdr_off + offsetof(struct tcphdr, source));
 	__u16 dst_port = load_half(skb, tcphdr_off + offsetof(struct tcphdr, dest));
 */
-	bpf_trace_printk("Caught packet port %hu->%hu, length %d, payload length %d\n", 
-		known_port, new_port, skb->len, payload_size);
+	char fmt[] = "Caught packet with length %d, payload length %d\n";
+	bpf_trace_printk(fmt, sizeof(fmt), skb->len, payload_size);
 	/*
 	// Get the port number at the specific offset
 	unsigned short *port = data + offset;

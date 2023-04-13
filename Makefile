@@ -1,7 +1,8 @@
 CC = clang
-LLC = llc-10
+LLC = llc
 TC = tc
 
+IFACE = wlan0
 TARGET = licfwd
 CFLAGS = -O2 -target bpf -emit-llvm -I/usr/include/x86_64-linux-gnu
 LDFLAGS = -march=bpf -filetype=obj
@@ -15,11 +16,11 @@ $(TARGET).o: $(TARGET).bc
 	$(LLC) $(LDFLAGS) -o $@ $<
 
 load: $(TARGET).o
-	$(TC) qdisc add dev eth0 clsact
-	$(TC) filter add dev eth0 ingress bpf da obj $(TARGET).o sec classifier
+	sudo $(TC) qdisc add dev $(IFACE) clsact
+	sudo $(TC) filter add dev $(IFACE) ingress bpf da obj $(TARGET).o sec classifier
 
 unload:
-	$(TC) qdisc del dev eth0 clsact
+	sudo $(TC) qdisc del dev $(IFACE) clsact
 
 clean:
 	rm -f $(TARGET).o $(TARGET).bc
